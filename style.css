@@ -1,42 +1,126 @@
-/* style.css */
-:root {
-    --primary: #25D366;
-    --off: #ff4b2b;
-    --dark: #0b141a;
-    --card-bg: #1e2a30;
-    --text-main: #e9edef;
-    --accent: #34b7f1;
-}
-
-/* ... අනෙකුත් සියලුම CSS කේත මෙතැන පේස්ට් කරන්න ... */
-
-.search-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
-    position: relative;
-}
-
-#commandSearch {
-    width: 100%;
-    max-width: 500px;
-    padding: 15px 20px;
-    border-radius: 30px;
-    background: rgba(255, 255, 255, 0.05);
+body {
+    background-color: #0b1120;
     color: white;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    outline: none;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
-.suggestions {
-    position: absolute;
-    top: 60px;
-    background: #1e2a30;
+/* Hero Section */
+.hero-section {
+    background-color: #f37021;
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.hero-section h1 { margin: 0; font-size: 2.5rem; }
+.hero-section p { margin: 15px 0; font-size: 1.1rem; }
+
+.btn-start {
+    background-color: #ffb444;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Main Container */
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.section-title {
+    color: #f37021;
+    margin-bottom: 30px;
+}
+
+/* Message Cards */
+.message-card {
+    background-color: #161f32;
+    border: 1px solid #2d3748;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.input-box h3 {
+    color: #ffb444;
+    font-size: 1rem;
+    margin-top: 0;
+}
+
+textarea {
     width: 100%;
-    max-width: 500px;
-    border-radius: 15px;
-    z-index: 1000;
-    display: none;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #1e293b;
+    border: 1px solid #4a5568;
+    border-radius: 8px;
+    color: white;
+    padding: 15px;
+    min-height: 100px;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.btn-send {
+    background-color: #8b4513;
+    color: #ffb444;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* User Section inside Card */
+.user-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.user-avatar {
+    font-size: 2.5rem;
+    color: #ffb444;
+    margin-right: 15px;
+}
+
+.username {
+    display: block;
+    color: #f37021;
+    font-weight: bold;
+}
+
+.date {
+    font-size: 0.8rem;
+    color: #a0aec0;
+}
+
+.message-content {
+    padding: 10px 0;
+    border-bottom: 1px solid #2d3748;
+    margin-bottom: 10px;
+}
+
+.message-footer button {
+    background: none;
+    border: none;
+    color: #a0aec0;
+    margin-right: 15px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.message-footer button:hover {
+    color: white;
 }
