@@ -3,48 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community Messages</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Lakmina WhatsApp Chat</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #0b141a; display: flex; justify-content: center; height: 100vh; }
+
+        .app-container { width: 100%; max-width: 450px; background: #0b141a; display: flex; flex-direction: column; position: relative; border: 1px solid #2d3748; }
+
+        /* Header */
+        .header { background: #202c33; padding: 10px 15px; display: flex; align-items: center; color: #e9edef; gap: 15px; border-bottom: 1px solid #2d3748; }
+        .header .avatar { width: 40px; height: 40px; background: #6a7175; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .header .user-info h4 { font-size: 16px; }
+        .header .user-info p { font-size: 12px; color: #00a884; }
+
+        /* Chat Window */
+        #chat-window { flex: 1; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-color: #0b141a; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+
+        .message { max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 14px; position: relative; color: #e9edef; line-height: 1.4; box-shadow: 0 1px 1px rgba(0,0,0,0.2); }
+        .sent { align-self: flex-end; background: #005c4b; border-top-right-radius: 0; }
+        .received { align-self: flex-start; background: #202c33; border-top-left-radius: 0; }
+        .time { font-size: 10px; color: #8696a0; float: right; margin-top: 5px; margin-left: 10px; }
+        .sender-name { font-size: 11px; color: #ffb444; font-weight: bold; margin-bottom: 3px; display: block; }
+
+        /* Input Area */
+        .input-area { background: #202c33; padding: 10px; display: flex; align-items: center; gap: 10px; }
+        input#username { position: absolute; top: 60px; left: 10px; background: #2a3942; border: 1px solid #00a884; color: white; padding: 5px; border-radius: 5px; font-size: 12px; width: 100px; z-index: 10; outline: none; }
+        input#msgInput { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 8px; color: white; outline: none; }
+        button#sendBtn { background: #00a884; border: none; width: 45px; height: 45px; border-radius: 50%; color: white; cursor: pointer; font-size: 20px; }
+    </style>
 </head>
 <body>
 
-    <header class="hero-section">
-        <h1>This is the Site of Our Official Projects</h1>
-        <p>Join hundreds of developers using our platform to build and scale their automated integrations.</p>
-        <button class="btn-start">Start Your Project Today</button>
-    </header>
-
-    <main class="container">
-        <h2 class="section-title">Community Messages (213)</h2>
-
-        <div class="message-card input-box">
-            <h3>Post as Anon-gBv4...</h3>
-            <textarea placeholder="Share your thoughts on Asitha-MD platform..."></textarea>
-            <div class="btn-container">
-                <button class="btn-send"><i class="fas fa-paper-plane"></i> Send Message</button>
-            </div>
-        </div>
-
-        <div class="message-card">
+    <div class="app-container">
+        <input type="text" id="username" placeholder="ඔබේ නම...">
+        
+        <div class="header">
+            <div class="avatar">L</div>
             <div class="user-info">
-                <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
-                <div class="user-details">
-                    <span class="username">wqaskhanpk7421</span>
-                    <span class="date">Mar 13, 2026, 08:40 PM</span>
-                </div>
-            </div>
-            <div class="message-content">
-                Hy
-            </div>
-            <div class="message-footer">
-                <button><i class="far fa-thumbs-up"></i> 2</button>
-                <button><i class="far fa-thumbs-down"></i> 0</button>
-                <button><i class="fas fa-reply"></i> Reply</button>
+                <h4>Official Group Chat</h4>
+                <p>online</p>
             </div>
         </div>
 
-    </main>
+        <div id="chat-window">
+            </div>
 
+        <div class="input-area">
+            <input type="text" id="msgInput" placeholder="පණිවිඩයක් ලියන්න..." autocomplete="off">
+            <button id="sendBtn">➤</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ඔබ ලබාදුන් Config එක මෙතැනට ඇතුළත් කර ඇත
+        const firebaseConfig = {
+            apiKey: "AIzaSyB7ZbhU6H_fGkZu4cWR4eyc8d0gakK7kdY",
+            authDomain: "mywhatsappchat-7cb60.firebaseapp.com",
+            projectId: "mywhatsappchat-7cb60",
+            storageBucket: "mywhatsappchat-7cb60.firebasestorage.app",
+            messagingSenderId: "479602961695",
+            appId: "1:479602961695:web:9e07a177da2235d9b2142a",
+            measurementId: "G-RE0HDT0FXD"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const messagesCol = collection(db, "chats");
+
+        const sendBtn = document.getElementById('sendBtn');
+        const msgInput = document.getElementById('msgInput');
+        const usernameInput = document.getElementById('username');
+        const chatWindow = document.getElementById('chat-window');
+
+        // පණිවිඩයක් යැවීම
+        async function sendMessage() {
+            const text = msgInput.value.trim();
+            const user = usernameInput.value.trim();
+            
+            if (user === "") {
+                alert("කරුණාකර ඔබේ නම ඇතුළත් කරන්න!");
+                return;
+            }
+
+            if (text !== "") {
+                try {
+                    await addDoc(messagesCol, {
+                        sender: user,
+                        message: text,
+                        timestamp: serverTimestamp()
+                    });
+                    msgInput.value = "";
+                } catch (e) {
+                    console.error("Error: ", e);
+                }
+            }
+        }
+
+        sendBtn.onclick = sendMessage;
+        msgInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
+
+        // පණිවිඩ Real-time ලබා ගැනීම
+        const q = query(messagesCol, orderBy("timestamp", "asc"));
+        onSnapshot(q, (snapshot) => {
+            chatWindow.innerHTML = "";
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const isMe = data.sender === usernameInput.value;
+                const timeStr = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "දැන්";
+
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `message ${isMe ? 'sent' : 'received'}`;
+                msgDiv.innerHTML = `
+                    <span class="sender-name">${isMe ? 'ඔබ' : data.sender}</span>
+                    ${data.message}
+                    <span class="time">${timeStr}</span>
+                `;
+                chatWindow.appendChild(msgDiv);
+            });
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        });
+    </script>
 </body>
 </html>
