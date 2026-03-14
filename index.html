@@ -1,50 +1,112 @@
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Community Chat</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #0b141a; display: flex; justify-content: center; height: 100vh; color: #e9edef; }
+        .app-container { width: 100%; max-width: 500px; background: #0b141a; display: flex; flex-direction: column; border-right: 1px solid #2d3748; border-left: 1px solid #2d3748; }
+        
+        /* WhatsApp Header */
+        .header { background: #202c33; padding: 12px 16px; display: flex; align-items: center; gap: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+        .header .avatar { width: 40px; height: 40px; background: #6a7175; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+        .header .info h4 { font-size: 16px; color: #e9edef; }
+        .header .info p { font-size: 12px; color: #8696a0; }
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyB7ZbhU6H_fGkZu4cWR4eyc8d0gakK7kdY",
-    authDomain: "mywhatsappchat-7cb60.firebaseapp.com",
-    projectId: "mywhatsappchat-7cb60",
-    storageBucket: "mywhatsappchat-7cb60.firebasestorage.app",
-    messagingSenderId: "479602961695",
-    appId: "1:479602961695:web:9e07a177da2235d9b2142a",
-    measurementId: "G-RE0HDT0FXD"
-  };
+        /* Messages Area */
+        #chat-window { flex: 1; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-color: #0b141a; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        
+        .msg { max-width: 85%; padding: 8px 12px; border-radius: 8px; font-size: 14px; position: relative; line-height: 1.5; box-shadow: 0 1px 1px rgba(0,0,0,0.3); }
+        .sent { align-self: flex-end; background: #005c4b; border-top-right-radius: 0; }
+        .received { align-self: flex-start; background: #202c33; border-top-left-radius: 0; }
+        
+        .sender { font-size: 12px; font-weight: bold; color: #ffb444; display: block; margin-bottom: 2px; }
+        .time { font-size: 10px; color: #8696a0; float: right; margin-top: 5px; margin-left: 8px; }
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+        /* Input Area */
+        .input-area { background: #202c33; padding: 10px; display: flex; align-items: center; gap: 10px; }
+        #username { position: absolute; top: 70px; left: 15px; background: #2a3942; border: 1px solid #00a884; color: white; padding: 4px 8px; border-radius: 5px; font-size: 12px; z-index: 100; }
+        #msgInput { flex: 1; background: #2a3942; border: none; padding: 12px; border-radius: 8px; color: white; outline: none; }
+        #sendBtn { background: #00a884; border: none; width: 45px; height: 45px; border-radius: 50%; color: white; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
 
-  const sendBtn = document.getElementById('sendBtn');
-  const msgInput = document.getElementById('msgInput');
-  const usernameInput = document.getElementById('username');
-  const chatWindow = document.getElementById('chat-window');
+    <div class="app-container">
+        <input type="text" id="username" placeholder="ඔබේ නම...">
+        <div class="header">
+            <div class="avatar">W</div>
+            <div class="info">
+                <h4>WhatsApp Community</h4>
+                <p>online</p>
+            </div>
+        </div>
 
-  sendBtn.onclick = async () => {
-    const text = msgInput.value.trim();
-    const user = usernameInput.value.trim() || "User";
-    if (text !== "") {
-      // මෙතැන 'chats' කියන නම Firebase එකේ තියෙන නමට සමාන විය යුතුයි
-      await addDoc(collection(db, "chats"), {
-        sender: user,
-        message: text,
-        timestamp: serverTimestamp()
-      });
-      msgInput.value = "";
-    }
-  };
+        <div id="chat-window"></div>
 
-  const q = query(collection(db, "chats"), orderBy("timestamp", "asc"));
-  onSnapshot(q, (snapshot) => {
-    chatWindow.innerHTML = "";
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const isMe = data.sender === usernameInput.value;
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `message ${isMe ? 'sent' : 'received'}`;
-      msgDiv.innerHTML = `<span class="sender-name">${data.sender}</span>${data.message}`;
-      chatWindow.appendChild(msgDiv);
-    });
-    chatWindow.scrollTop = chatWindow.scrollHeight;
-  });
-</script>
+        <div class="input-area">
+            <input type="text" id="msgInput" placeholder="පණිවිඩයක් ලියන්න..." autocomplete="off">
+            <button id="sendBtn">➤</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ඔයාගේ Config එක මෙතන තියෙනවා
+        const firebaseConfig = {
+            apiKey: "AIzaSyB7ZbhU6H_fGkZu4cWR4eyc8d0gakK7kdY",
+  authDomain: "mywhatsappchat-7cb60.firebaseapp.com",
+  projectId: "mywhatsappchat-7cb60",
+  storageBucket: "mywhatsappchat-7cb60.firebasestorage.app",
+  messagingSenderId: "479602961695",
+  appId: "1:479602961695:web:9e07a177da2235d9b2142a",
+  measurementId: "G-RE0HDT0FXD"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const chatsCol = collection(db, "whatsapp_v2"); // Collection නම මම අලුත් කළා
+
+        const sendBtn = document.getElementById('sendBtn');
+        const msgInput = document.getElementById('msgInput');
+        const usernameInput = document.getElementById('username');
+        const chatWindow = document.getElementById('chat-window');
+
+        async function sendMsg() {
+            const text = msgInput.value.trim();
+            const user = usernameInput.value.trim() || "User";
+            if (text) {
+                await addDoc(chatsCol, {
+                    name: user,
+                    text: text,
+                    time: serverTimestamp()
+                });
+                msgInput.value = "";
+            }
+        }
+
+        sendBtn.onclick = sendMsg;
+        msgInput.onkeypress = (e) => { if(e.key === 'Enter') sendMsg(); };
+
+        const q = query(chatsCol, orderBy("time", "asc"));
+        onSnapshot(q, (snapshot) => {
+            chatWindow.innerHTML = "";
+            snapshot.forEach(doc => {
+                const d = doc.data();
+                const isMe = d.name === usernameInput.value;
+                const time = d.time ? new Date(d.time.seconds * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "";
+                
+                const div = document.createElement('div');
+                div.className = `msg ${isMe ? 'sent' : 'received'}`;
+                div.innerHTML = `<span class="sender">${isMe ? 'ඔබ' : d.name}</span>${d.text}<span class="time">${time}</span>`;
+                chatWindow.appendChild(div);
+            });
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        });
+    </script>
+</body>
+</html>
